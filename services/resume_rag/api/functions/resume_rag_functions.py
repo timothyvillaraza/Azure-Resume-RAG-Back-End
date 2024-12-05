@@ -14,7 +14,7 @@ from services.resume_rag.api.functions.models.get_resume_inference_response impo
 bp = func.Blueprint()
 
 # Service Registration
-_videoRagService = ResumeRagService()
+_resumeRagService = ResumeRagService()
     
 @bp.function_name('GetResumeInference')
 @bp.route(route="getresumeinference", methods=[func.HttpMethod.POST])
@@ -27,7 +27,7 @@ async def get_resume_inference(req: func.HttpRequest) -> func.HttpResponse:
         request = GetResumeInferenceRequest(**req.get_json())
 
         # Service Layer Call
-        get_resume_inference_model = await _videoRagService.get_resume_inference_async(request.query)
+        get_resume_inference_model = await _resumeRagService.get_resume_inference_async(request.query)
         
         # Map to response
         # response = response_model
@@ -46,12 +46,14 @@ async def get_resume_inference(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(str(e), status_code=getattr(e, 'status_code', 400))
 
 # TODO: Replace with Blob Storage
-@bp.function_name(name="embedresumetimer")
-@bp.schedule(schedule="0 0 * * *", arg_name="embedresumetimer", run_on_startup=True, use_monitor=False)
-async def embed_resume_timer(embedresumetimer: func.TimerRequest) -> None:
-    await _videoRagService.delete_resume_embeddings()
+@bp.function_name(name="embedresumeonupload")
+@bp.blob_trigger(arg_name="blob", path="bcresumerag/resume.pdf", connection="AzureWebJobsStorage")
+async def embed_resume_on_upload(blob: func.InputStream) -> None:
+    # TODO: DEBUG
+    logging.info(f'{blob.name} detected')
+    # await _resumeRagService.delete_resume_embeddings()
     
-    iframe_url = 'https://resume.creddle.io/embed/6x3f8thxdss'
-    await _videoRagService.save_resume_embeddings_from_iframe(iframe_url)
+    # iframe_url = 'https://resume.creddle.io/embed/6x3f8thxdss'
+    # await _resumeRagService.save_resume_embeddings_from_pdf(iframe_url)
     
-    logging.info(f'Timer trigger function ran at {datetime.now()}. Resume embeddingss deleted.')
+    # logging.info(f'Blob trigger function `embedresumeonupload` ran at {datetime.now()}.')

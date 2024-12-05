@@ -30,7 +30,7 @@ class ResumeRagService:
         
         return llm_response
     
-    async def save_resume_embeddings_from_iframe(self, url: str) -> None:
+    async def save_resume_embeddings_from_pdf(self, url: str) -> None:
         iframe_content = requests.get(url)
         
         if iframe_content.status_code == 200:

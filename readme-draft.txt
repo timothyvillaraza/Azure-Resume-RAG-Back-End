@@ -1,4 +1,7 @@
 Deploying Cloud Infrastructure
+    Login to azure account
+        `az login`
+
     Deploy
         Navigate to <root>/deploy/terraform
         Create secrets.tfvars
@@ -19,6 +22,27 @@ Database Setup
         CREATE EXTENSION IF NOT EXISTS vector;
 
 Local Development (w/ Deployed Database)
+    Install Dependencies from Requirmenets files
+        Navigate to root
+        `pip install -r requirements.txt`
+
+    Configure Azure local.settings.json
+        Create a local.settings.json in the root folder, get the connection string of the storage account from <storage account> -> Security + networking -> Access Keys
+        ```
+        {
+        "IsEncrypted": false,
+        "Values": {
+            "AzureWebJobsStorage": <storage account connection string>,
+            "FUNCTIONS_WORKER_RUNTIME": "python",
+            "AzureWebJobsFeatureFlags": "EnableWorkerIndexing"
+        },
+        "Host": {
+            "LocalHttpPort": 5004,
+            "CORS": "*"
+        }
+        }
+        ```
+
     Database IP White Listing
         On the azure portal, navigate to the database -> Settings -> Networking and allow your IP
 
