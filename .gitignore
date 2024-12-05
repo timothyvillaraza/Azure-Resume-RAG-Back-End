@@ -134,9 +134,31 @@ __queuestorage__
 __azurite_db*__.json
 .python_packages
 
-# Terraform working directory and state files
-.terraform/           # Terraform provider plugins and cache
-terraform.tfstate     # Terraform state file
-terraform.tfstate.backup # Backup state file
-crash.log             # Crash log (if any)
-*.tfplan              # Terraform plan files (optional binary output of 'terraform plan')
+# Local Terraform directories
+.terraform/
+
+# Local Terraform state files
+*.tfstate
+*.tfstate.backup
+
+# Crash logs
+crash.log
+
+# Variable files with sensitive information
+*.tfvars
+
+# Ignore local override files, which can contain sensitive information or local-only changes
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore the generated plan files, which can be quite large
+*.tfplan
+
+# Lock files (should typically be included, not ignored)
+# Uncomment below line only if you want to ignore it
+# .terraform.lock.hcl
+
+# Ignore output from CLI
+.terraform.tfstate.d/
