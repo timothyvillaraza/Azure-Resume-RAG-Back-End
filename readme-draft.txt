@@ -5,21 +5,18 @@ Deploying Cloud Infrastructure
     Deploy
         Navigate to <root>/deploy/terraform
         Create secrets.tfvars
-            ``
-            postgres_admin_username = "pgadmin"             # OPTIONAL: The default of "pgadmin" is configured in variables.tf
-            postgres_admin_password = "StrongPassword123!"  # PASSWORD
-            ```
+        Sample:
+        ``
+        # secrets.tfvars
+        azure_subscription_id   = <Subscription ID>
+        postgres_admin_username = <Username>  # OPTIONAL: The default of "pgadmin" is configured in variables.tf
+        postgres_admin_password = <Password>
+        ```
         terraform init
         terraform apply -var-file="secrets.tfvars"
     
     Confirm
         On the azure portal, check the resource groups
-
-Database Setup
-    Create Vector Extension    
-        Setting up Vector Extension - Enables the use of vector types
-        Connect to the postgres database made by terraform
-        CREATE EXTENSION IF NOT EXISTS vector;
 
 Local Development (w/ Deployed Database)
     Install Dependencies from Requirmenets files
@@ -28,6 +25,7 @@ Local Development (w/ Deployed Database)
 
     Configure Azure local.settings.json
         Create a local.settings.json in the root folder, get the connection string of the storage account from <storage account> -> Security + networking -> Access Keys
+        Sample:
         ```
         {
         "IsEncrypted": false,
@@ -44,6 +42,7 @@ Local Development (w/ Deployed Database)
         ```
 
     Database IP White Listing
+        Allows you to connect to the azure hosted postgres database from you local computer
         On the azure portal, navigate to the database -> Settings -> Networking and allow your IP
 
     .env setup
