@@ -1,6 +1,5 @@
 import logging
 import requests
-from bs4 import BeautifulSoup, Comment
 from langchain.docstore.document import Document
 from io import BytesIO
 from PyPDF2 import PdfReader
@@ -17,18 +16,17 @@ class ResumeRagService:
         self._resume_open_ai = ResumeOpenAI()
         self._transcriptRepository = TranscriptRepository()
     
-    async def get_resume_inference_async(self, query: str) -> ResumeInferenceModel:
-        # Get Relevant Documents from Repository
-        retrieved_documents_score_tuples = await self._transcriptRepository.get_by_semantic_relevance_async(session_id='resume', query=query, results_count=50)
+    async def get_resume_inference_async(self, user_query: str) -> ResumeInferenceModel:
+        # User Query -> AI Extended User Query
+        ai_extended_query = await self._resume_open_ai.extend_user_query_async(user_query)
         
-        # TODO: Optimize retrieval by cleaning up embedded document sources, removing timestamps from chunks,
-        #       adding heuristics, or using a different embedding model.
-
-        # Example improvement: Filter documents by score > 0.8
+        # AI Extended User Query -> Relevant Resume Bullet Points
+        retrieved_documents_score_tuples = await self._transcriptRepository.get_by_semantic_relevance_async(collection='resume', query=ai_extended_query, results_count=7)
+        
         retrieved_documents = [document for document, score in retrieved_documents_score_tuples]
         
-        # Save user message, get LLM response, save LLM response 
-        llm_response = await self._resume_open_ai.get_resume_inference_async(query, retrieved_documents)
+        # Send LLM User Query + Context
+        llm_response = await self._resume_open_ai.get_resume_inference_async(user_query, retrieved_documents)
         
         return llm_response
     
@@ -37,7 +35,7 @@ class ResumeRagService:
         resume_text = _extract_text_from_pdf(pdf)
         
         # Plain Text Resume -> Structured In-Memory Resume
-        resume_model = await self._resume_open_ai.parse_resume_async(resume_text)
+        resume_model = await self._resume_open_ai.parse_resume_async(resume_text, n_descriptions=13)
         
         # Resume Bullet Points -> Langchain Documents
         documents = []
@@ -56,12 +54,9 @@ class ResumeRagService:
         
         # Langchain Documents -> Vector Embeddings
         await self._transcriptRepository.save_resume_embeddings_async(documents)
-        
-        return
       
     async def delete_resume_embeddings(self) -> None:
         await self._transcriptRepository.delete_resume_embeddings_async()
-        return
         
 
 # =======================================
