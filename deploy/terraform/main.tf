@@ -33,8 +33,19 @@ resource "azurerm_postgresql_flexible_server" "pg_resume_rag" {
   version             = "15"
   administrator_login = var.postgres_admin_username
   administrator_password = var.postgres_admin_password
+  zone                = "2"            # Auto assigned to 2 by default, now explictly adding to avoid as detected change on rerun
+  
+  public_network_access_enabled = true # Allows for public access from any Azure service. For our application, it allows other function apps to access the db.
 
   tags = var.resume_rag_tags
+}
+
+# Allows Azure Services - Use Case: Allows function apps to access flexible server dbs 
+resource "azurerm_postgresql_flexible_server_firewall_rule" "allow_azure_services" {
+  name                = "AllowAzureServices"
+  server_id           = azurerm_postgresql_flexible_server.pg_resume_rag.id
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "0.0.0.0"
 }
 
 # Allow-List the 'vector' Extension
