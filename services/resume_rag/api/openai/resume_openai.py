@@ -35,7 +35,7 @@ class ResumeOpenAI:
     async def get_resume_inference_async(self, query, documents: List[Document]):        
         context = "Below is a list of context sources. What ever is mentioned MUST be included in context sources to trace back the source of the info:"
         for doc in documents:
-            # Company Name: Bullet Point
+            # Temporarily append "At <Company Name>: <Bullet Point>" for LLM Context
             context += f'At {doc.metadata.get("company", "Experience")}: {doc.metadata.get("source_text", "Work Description")}\n'
         
         completion = self.client.beta.chat.completions.parse(
@@ -48,4 +48,9 @@ class ResumeOpenAI:
             response_format=ResumeInferenceModel
         )
         
-        return completion.choices[0].message.parsed
+        # Remove "At <Company Name>: <Bullet Point>"
+        llm_response = completion.choices[0].message.parsed
+        for i, source in enumerate(llm_response.context_sources):
+            llm_response.context_sources[i] = source.split(": ", maxsplit=1)[1] if ": " in source else source
+        
+        return llm_response
