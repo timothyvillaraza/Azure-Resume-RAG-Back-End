@@ -50,9 +50,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    __environment__
     
     steps:
       - name: Download artifact from build job
@@ -69,7 +67,5 @@ jobs:
         with:
           app-name: 'faresumerag'
           slot-name: 'Production'
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_44222EF6203E4FA3BF5F5D9B93629394 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_43F755B8328A4B32A9F61ABA203E85B0 }}
