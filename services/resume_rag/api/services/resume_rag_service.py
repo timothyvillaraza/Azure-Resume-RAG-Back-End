@@ -1,5 +1,4 @@
 import logging
-import requests
 from langchain.docstore.document import Document
 from io import BytesIO
 from PyPDF2 import PdfReader
