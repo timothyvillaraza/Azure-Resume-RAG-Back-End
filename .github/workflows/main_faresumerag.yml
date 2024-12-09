@@ -8,6 +8,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - readme.md
+      - readme-draft.txt
+      - deploy/**
   workflow_dispatch:
 
 env:
